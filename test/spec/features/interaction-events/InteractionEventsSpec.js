@@ -5,6 +5,10 @@ import {
   inject
 } from 'test/TestHelper';
 
+import {
+  query as domQuery
+} from 'min-dom';
+
 import interactionEventsModule from 'lib/features/interaction-events';
 
 var bindings = {
@@ -174,6 +178,54 @@ describe('features/interaction-events', function() {
   });
 
 
+  describe('hit style', function() {
+
+    it('should append default hit style', inject(
+      function(canvas, elementFactory, elementRegistry) {
+
+        // given
+        var shape = elementFactory.createShape({
+          id: 'shape',
+          x: 110, y: 110, width: 100, height: 100
+        });
+
+        // when
+        canvas.addShape(shape);
+
+        // then
+        var gfx = elementRegistry.getGraphics(shape),
+            hit = domQuery('.djs-hit', gfx);
+
+        expect(cssAttr(hit, 'pointerEvents')).to.not.eql('stroke');
+
+      }
+    ));
+
+
+    it('should append frame hit style', inject(
+      function(canvas, elementFactory, elementRegistry) {
+
+        // given
+        var shape = elementFactory.createShape({
+          id: 'shape',
+          x: 110, y: 210, width: 100, height: 100,
+          frameOnly: true
+        });
+
+        // when
+        canvas.addShape(shape);
+
+        // then
+        var gfx = elementRegistry.getGraphics(shape),
+            hit = domQuery('.djs-hit', gfx);
+
+        expect(cssAttr(hit, 'pointerEvents')).to.eql('stroke');
+
+      }
+    ));
+  });
+
+
   describe('register / unregister', function() {
 
     it('should register', inject(
@@ -266,4 +318,8 @@ function mouseEvent(type, button) {
   );
 
   return event;
+}
+
+function cssAttr(gfx, name) {
+  return gfx.style[name];
 }
