@@ -40,6 +40,7 @@ describe('features/create - Create', function() {
       parentShape,
       hostShape,
       childShape,
+      frameShape,
       newShape;
 
   beforeEach(inject(function(elementFactory, canvas) {
@@ -73,6 +74,15 @@ describe('features/create - Create', function() {
     });
 
     canvas.addShape(childShape, rootShape);
+
+
+    frameShape = elementFactory.createShape({
+      id: 'frameShape',
+      x: 400, y: 50, width: 100, height: 100,
+      frameOnly: true
+    });
+
+    canvas.addShape(frameShape, rootShape);
 
 
     newShape = elementFactory.createShape({
@@ -261,6 +271,21 @@ describe('features/create - Create', function() {
       dragging.move(canvasEvent({ x: 50, y: 50 }));
 
       expect(canvas.hasMarker(childShape, 'drop-not-ok')).to.be.true;
+    }));
+
+
+    it('should add "frame-drop-not-ok" marker', inject(function(canvas, create, elementRegistry, dragging) {
+      // given
+      var targetGfx = elementRegistry.getGraphics('frameShape');
+
+      // when
+      create.start(canvasEvent({ x: 0, y: 0 }), newShape);
+
+      dragging.move(canvasEvent({ x: 50, y: 25 }));
+      dragging.hover({ element: frameShape, gfx: targetGfx });
+      dragging.move(canvasEvent({ x: 50, y: 50 }));
+
+      expect(canvas.hasMarker(frameShape, 'frame-drop-not-ok')).to.be.true;
     }));
 
 
